@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [redirect-service, stats-service, admin-panel]
+    defaults:
+      run:
+        working-directory: ${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --python 3.12
+
+      - name: Ruff lint
+        run: uvx ruff@0.8.4 check app
+
+      - name: Ruff format check
+        run: uvx ruff@0.8.4 format --check app
+
+      - name: Mypy (strict)
+        run: uv run --with mypy mypy --config-file ../pyproject.toml app
+
+      - name: Pytest
+        run: uv run pytest -q

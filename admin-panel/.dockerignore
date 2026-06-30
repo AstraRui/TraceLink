@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+# Local Tailwind binary (39 MB) — the image downloads its own linux build.
+tailwindcss
+tailwindcss.exe
+# Built CSS is produced by the build stage, not copied from the host.
+static/css/output.css

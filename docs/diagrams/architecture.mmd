@@ -1,0 +1,37 @@
+flowchart TB
+    User([Пользователь / Браузер])
+
+    subgraph gw[Шлюз]
+        NGINX[nginx :8080<br/>+ X-Request-ID]
+    end
+
+    subgraph svc[Микросервисы - FastAPI]
+        ADMIN[admin-panel<br/>Jinja2 SSR + JWT]
+        REDIR[redirect-service]
+        STATS[stats-service]
+    end
+
+    subgraph data[Хранилища]
+        PG[(PostgreSQL<br/>links · clicks · users · system_logs)]
+        RD[(Redis)]
+    end
+
+    User -->|UI: / /login /links /logs /static| NGINX
+    User -->|короткая ссылка: /code| NGINX
+
+    NGINX -->|серверный рендеринг| ADMIN
+    NGINX -->|301/302 редирект| REDIR
+
+    ADMIN -->|создать / удалить ссылки<br/>X-Internal-Token| REDIR
+    ADMIN -->|сводка статистики| STATS
+    ADMIN -->|пользователи / auth| PG
+
+    REDIR -->|кэш горячих ссылок| RD
+    REDIR -->|ссылки| PG
+    REDIR -.->|клик - async| STATS
+
+    STATS -->|клики| PG
+
+    ADMIN -.->|логи async| PG
+    REDIR -.->|логи async| PG
+    STATS -.->|логи async| PG

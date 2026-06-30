@@ -1,0 +1,6 @@
+# Normalize all text to LF in the repo (keeps shell entrypoints valid in Docker
+# regardless of the contributor's OS / core.autocrlf setting).
+* text=auto eol=lf
+
+*.png binary
+*.ico binary

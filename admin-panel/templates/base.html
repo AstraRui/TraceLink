@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Link Shortener Admin{% endblock %}</title>
+    <!-- Apply the saved theme before paint to avoid a flash of the wrong theme. -->
+    <script>
+      (function () {
+        try {
+          var s = localStorage.getItem("theme");
+          var d = s ? s === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+          if (d) document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="/static/css/output.css" />
+    <script src="/static/js/htmx.min.js" defer></script>
+    <script src="/static/js/theme.js" defer></script>
+  </head>
+  <body class="h-full bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased transition-colors">
+    {% block body %}{% endblock %}
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

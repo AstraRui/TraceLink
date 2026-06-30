@@ -1,0 +1,56 @@
+{% set today = stats.clicks_by_day[-1].clicks if stats.clicks_by_day else 0 %}
+{% set top = stats.top_links[0] if stats.top_links else None %}
+
+<!-- Compact KPI strip (values carry ids so charts.js can update them in place) -->
+<section class="grid gap-4 sm:grid-cols-3 mb-6">
+  <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 flex items-center gap-3">
+    <span class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+    </span>
+    <div class="min-w-0">
+      <p class="text-xs text-slate-500 dark:text-slate-400">Total clicks (30d)</p>
+      <p id="kpi-total" class="text-2xl font-bold leading-tight">{{ stats.total_clicks }}</p>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 flex items-center gap-3">
+    <span class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    </span>
+    <div class="min-w-0">
+      <p class="text-xs text-slate-500 dark:text-slate-400">Clicks today</p>
+      <p id="kpi-today" class="text-2xl font-bold leading-tight">{{ today }}</p>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 flex items-center gap-3">
+    <span class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.5l2.6 5.27 5.82.85-4.21 4.1 1 5.8L11.48 17l-5.2 2.74 1-5.8L3.06 9.62l5.82-.85z"/></svg>
+    </span>
+    <div class="min-w-0">
+      <p class="text-xs text-slate-500 dark:text-slate-400">Top link</p>
+      <p id="kpi-top" class="text-lg font-bold leading-tight truncate">{{ top.short_code if top else '—' }}</p>
+      <p id="kpi-top-clicks" class="text-xs text-slate-400 dark:text-slate-500">{{ (top.clicks ~ ' clicks') if top else '' }}</p>
+    </div>
+  </div>
+</section>
+
+<section class="mb-6">
+  <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-5">
+    <p class="text-slate-500 dark:text-slate-400 text-sm mb-2">Clicks per day</p>
+    <div class="relative w-full" style="height:170px"><canvas id="chart-by-day"></canvas></div>
+  </div>
+</section>
+
+<section class="grid gap-6 md:grid-cols-2 mb-8">
+  <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-5">
+    <p class="text-slate-500 dark:text-slate-400 text-sm mb-2">Devices</p>
+    <div class="relative w-full" style="height:190px"><canvas id="chart-devices"></canvas></div>
+  </div>
+  <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-5">
+    <p class="text-slate-500 dark:text-slate-400 text-sm mb-2">Browsers</p>
+    <div class="relative w-full" style="height:190px"><canvas id="chart-browsers"></canvas></div>
+  </div>
+</section>
+
+<script id="stats-data" type="application/json">{{ stats | tojson }}</script>

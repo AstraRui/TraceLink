@@ -1,0 +1,42 @@
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# ─── Secrets / environment ───
+# Never commit real secrets. Only .env.example is tracked.
+.env
+.env.*
+!.env.example
+
+# ─── Databases ───
+*.db
+*.sqlite3
+
+# ─── Tooling caches / coverage ───
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# ─── Tailwind standalone CLI + build output ───
+tailwindcss
+tailwindcss.exe
+tailwindcss-*
+admin-panel/static/css/output.css
+
+# ─── Editors / OS ───
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

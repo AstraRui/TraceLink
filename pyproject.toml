@@ -1,0 +1,35 @@
+# Repo-wide tooling config (ruff + mypy) shared by all three services.
+# Each service keeps its own pyproject.toml for runtime dependencies.
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["**/db/migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM", "ASYNC", "S"]
+ignore = [
+    "B008",   # FastAPI uses function calls (Depends(), etc.) in argument defaults
+    "S104",   # binding 0.0.0.0 is intentional inside containers
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101", "S105", "S106"]   # asserts + dummy tokens/passwords in tests
+"**/core/config.py" = ["S105"]      # dev-only placeholder defaults; real values come from env
+"**/core/logging.py" = ["S110", "SIM105"]   # log handler deliberately swallows errors (never break the app)
+"**/services/logs.py" = ["S608"]            # query built from static clauses; all values are bound params
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+exclude = ["db/migrations/"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "-ra"

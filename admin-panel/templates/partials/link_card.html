@@ -1,0 +1,32 @@
+<div data-link-card
+  class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 flex gap-4">
+  <img src="{{ link.qr }}" alt="QR code" class="w-20 h-20 rounded-lg border border-slate-200 dark:border-slate-600 bg-white shrink-0" />
+  <div class="min-w-0 flex-1">
+    <a href="{{ base_url }}/{{ link.short_code }}" target="_blank" rel="noopener"
+      class="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline break-all">{{ base_url }}/{{ link.short_code }}</a>
+    <p class="text-slate-500 dark:text-slate-400 text-xs break-all mt-1">{{ link.original_url }}</p>
+    <div class="flex flex-wrap gap-2 mt-2">
+      {% if link.is_private %}
+      <span tabindex="0" class="relative inline-flex group outline-none">
+        <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded px-2 py-0.5 cursor-help">private ⓘ</span>
+        <span class="pointer-events-none absolute left-0 bottom-full mb-1 w-60 rounded-lg bg-slate-900 text-white text-xs leading-snug px-3 py-2 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition z-20 shadow-lg">
+          The redirect still works for anyone with the link; the flag keeps it out of public link listings.
+        </span>
+      </span>
+      {% endif %}
+      {% if link.expires_at %}
+      <span class="text-xs bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 rounded px-2 py-0.5">expires</span>
+      {% endif %}
+    </div>
+    <div class="flex gap-4 mt-3 text-xs font-medium">
+      <a href="/links/{{ link.short_code }}"
+        class="text-indigo-600 dark:text-indigo-400 hover:underline">Details</a>
+      <button type="button"
+        hx-delete="/links/{{ link.short_code }}"
+        hx-target="closest [data-link-card]"
+        hx-swap="outerHTML"
+        hx-confirm="Delete this link and all its analytics?"
+        class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
+    </div>
+  </div>
+</div>

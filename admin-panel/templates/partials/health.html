@@ -1,0 +1,16 @@
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+  {% for c in components %}
+  <div class="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 px-3 py-2">
+    <span class="relative flex h-2.5 w-2.5">
+      {% if c.ok %}
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+      {% endif %}
+      <span class="relative inline-flex rounded-full h-2.5 w-2.5 {{ 'bg-emerald-500' if c.ok else 'bg-red-500' }}"></span>
+    </span>
+    <span class="text-sm truncate">{{ c.name }}</span>
+    <span class="ml-auto text-xs font-medium {{ 'text-emerald-600 dark:text-emerald-400' if c.ok else 'text-red-600 dark:text-red-400' }}">
+      {{ 'up' if c.ok else 'down' }}
+    </span>
+  </div>
+  {% endfor %}
+</div>

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block body %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <header class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold">🔗 Your links</h1>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">Signed in as {{ user.username }}</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="/logs"
+        class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Logs
+      </a>
+      <button type="button" data-theme-toggle aria-label="Toggle dark mode"
+        class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+        <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.36 6.36l-.7-.7M6.34 6.34l-.7-.7m12.72 0l-.7.7M6.34 17.66l-.7.7M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
+      <form method="post" action="/logout">
+        <button class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+          Log out
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <!-- System Health: htmx loads + refreshes the service indicators. -->
+  <section class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400">System Health</h2>
+      <span class="text-xs text-slate-400 dark:text-slate-500">auto-refresh · 10s</span>
+    </div>
+    <div id="health-block" hx-get="/partials/health" hx-trigger="load, every 10s" hx-swap="innerHTML">
+      <p class="text-xs text-slate-400">checking…</p>
+    </div>
+  </section>
+
+  <!-- Live stats. Charts are built once; the poller below fetches JSON and the
+       script updates them in place (no canvas recreation, no layout jump). -->
+  <div id="stats-block">
+    {% include "partials/stats.html" %}
+  </div>
+  <div hx-get="/partials/stats.json" hx-trigger="every 5s" hx-swap="none"
+    hx-on::after-request="if(event.detail.successful){try{window.applyStats(JSON.parse(event.detail.xhr.response))}catch(e){}}"></div>
+
+  <section class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-6 mb-8">
+    <h2 class="font-semibold mb-4">Create a short link</h2>
+    <form hx-post="/links" hx-target="#links" hx-swap="afterbegin"
+      hx-on::after-request="if(event.detail.successful) this.reset()"
+      class="grid gap-3 sm:grid-cols-[1fr_auto_auto_auto] items-end">
+      <div>
+        <label class="block text-sm font-medium mb-1">Long URL</label>
+        <input name="original_url" type="url" required placeholder="https://example.com/very/long/link"
+          class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">TTL (days)</label>
+        <input name="ttl_days" type="number" min="1" placeholder="∞"
+          class="w-24 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500" />
+      </div>
+      <label class="flex items-center gap-1.5 text-sm pb-2">
+        <input name="is_private" type="checkbox" class="rounded border-slate-300 dark:border-slate-600" /> Private
+        <span tabindex="0" class="relative inline-flex group outline-none" aria-label="What does private mean?">
+          <svg class="w-4 h-4 text-slate-400 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25h.75v4.5h.75M12 8.25h.008M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 rounded-lg bg-slate-900 text-white text-xs leading-snug px-3 py-2 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition z-20 shadow-lg">
+            The short link still redirects for anyone who has it. “Private” only flags the link so it is excluded from any public link listing.
+          </span>
+        </span>
+      </label>
+      <button class="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 transition">
+        Shorten
+      </button>
+    </form>
+    <div id="link-error"></div>
+  </section>
+
+  <section>
+    <div id="links" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {% for link in links %}
+        {% include "partials/link_card.html" %}
+      {% else %}
+        <p class="text-slate-500 dark:text-slate-400">No links yet. Create your first one above.</p>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/chart.umd.min.js"></script>
+<script src="/static/js/charts.js"></script>
+{% endblock %}
